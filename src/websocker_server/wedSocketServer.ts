@@ -3,7 +3,7 @@ import messageHandler from './messageHandler';
 
 class WedSocketServer {
   public start() {
-    const port = Number(process.env.WEBSOCKER_PORT) || 8080;
+    const port = parseInt(process.env.WEBSOCKER_PORT) || 8080;
     const wss = new WebSocketServer({ port });
     this.createWedSocketStream(wss, port);
 
