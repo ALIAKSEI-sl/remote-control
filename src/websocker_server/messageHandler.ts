@@ -1,4 +1,5 @@
 import { Duplex } from 'node:stream';
+import { mouse, screen } from '@nut-tree/nut-js';
 
 interface Navigation {
   command: string,
@@ -9,18 +10,44 @@ interface Navigation {
 class MessageHandler {
   private sizeImage = 200;
 
-  public start(duplexStream: Duplex, data: string) {
+  public async start(duplexStream: Duplex, data: string) {
     const { command, width, length } = this.parseMessage(data);
-    console.log(command, width, length);
+    const { x: cursorPositionX, y: cursorPositionY } = await mouse.getPosition();
+    const widthScreen = await screen.width();
+    const heighScreen = await screen.height();
+    //console.log(command, width, length);
+    console.log(cursorPositionX, cursorPositionY);
+    //console.log(widthScreen, heighScreen);
 
     switch (command) {
-      case ('mouse_up'):
+      case ('mouse_up'): {
+        if (cursorPositionY > 0) {
+          const newCursorPositionY = cursorPositionY - width > 0 ? cursorPositionY - width : 0;
+          //await mouse.move([{ x: cursorPositionX, y: newCursorPositionY }]);
+          await mouse.setPosition({ x: cursorPositionX, y: newCursorPositionY });
+        }
+      }
         break;
-      case ('mouse_down'):
+      case ('mouse_down'): {
+        if (cursorPositionY < heighScreen) {
+          const newCursorPositionY = cursorPositionY + width < heighScreen ? cursorPositionY + width : heighScreen;
+          await mouse.move([{ x: cursorPositionX, y: newCursorPositionY }]);
+        }
+      }
         break;
-      case ('mouse_left'):
+      case ('mouse_left'): {
+        if (cursorPositionX > 0) {
+          const newCursorPositionX = cursorPositionX - width > 0 ? cursorPositionX - width : 0;
+          await mouse.move([{ x: newCursorPositionX, y: cursorPositionY }]);
+        }
+      }
         break;
-      case ('mouse_right'):
+      case ('mouse_right'): {
+        if (cursorPositionX < widthScreen) {
+          const newCursorPositionX = cursorPositionX + width < widthScreen ? cursorPositionX + width : widthScreen;
+          await mouse.move([{ x: newCursorPositionX, y: cursorPositionY }]);
+        }
+      }
         break;
       case ('mouse_position'):
         break;
