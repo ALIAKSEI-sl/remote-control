@@ -1,5 +1,6 @@
 import { Duplex } from 'node:stream';
 import { mouse, screen } from '@nut-tree/nut-js';
+import drawShape from './drawShape';
 
 interface Navigation {
   command: string,
@@ -16,14 +17,13 @@ class MessageHandler {
     const widthScreen = await screen.width();
     const heighScreen = await screen.height();
     //console.log(command, width, length);
-    console.log(cursorPositionX, cursorPositionY);
+    //console.log(cursorPositionX, cursorPositionY);
     //console.log(widthScreen, heighScreen);
 
     switch (command) {
       case ('mouse_up'): {
         if (cursorPositionY > 0) {
           const newCursorPositionY = cursorPositionY - width > 0 ? cursorPositionY - width : 0;
-          //await mouse.move([{ x: cursorPositionX, y: newCursorPositionY }]);
           await mouse.setPosition({ x: cursorPositionX, y: newCursorPositionY });
         }
       }
@@ -31,31 +31,31 @@ class MessageHandler {
       case ('mouse_down'): {
         if (cursorPositionY < heighScreen) {
           const newCursorPositionY = cursorPositionY + width < heighScreen ? cursorPositionY + width : heighScreen;
-          await mouse.move([{ x: cursorPositionX, y: newCursorPositionY }]);
+          await mouse.setPosition({ x: cursorPositionX, y: newCursorPositionY });
         }
       }
         break;
       case ('mouse_left'): {
         if (cursorPositionX > 0) {
           const newCursorPositionX = cursorPositionX - width > 0 ? cursorPositionX - width : 0;
-          await mouse.move([{ x: newCursorPositionX, y: cursorPositionY }]);
+          await mouse.setPosition({ x: newCursorPositionX, y: cursorPositionY });
         }
       }
         break;
       case ('mouse_right'): {
         if (cursorPositionX < widthScreen) {
           const newCursorPositionX = cursorPositionX + width < widthScreen ? cursorPositionX + width : widthScreen;
-          await mouse.move([{ x: newCursorPositionX, y: cursorPositionY }]);
+          await mouse.setPosition({ x: newCursorPositionX, y: cursorPositionY });
         }
       }
         break;
-      case ('mouse_position'):
+      case ('mouse_position'): duplexStream.write(`mouse_position ${cursorPositionX},${cursorPositionY}`);
         break;
-      case ('draw_circle'):
+      case ('draw_circle'): drawShape.rectangle(width, length);
         break;
-      case ('draw_rectangle'):
+      case ('draw_rectangle'): drawShape.rectangle(width, length);
         break;
-      case ('draw_square'):
+      case ('draw_square'): drawShape.circle(width);
         break;
       case ('prnt_scrn'):
         break;
