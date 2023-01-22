@@ -1,6 +1,7 @@
 import { Duplex } from 'node:stream';
 import { mouse, screen } from '@nut-tree/nut-js';
 import drawShape from './drawShape';
+import printScreenHandler from './printScreenHandler';
 
 interface Navigation {
   command: string,
@@ -9,16 +10,11 @@ interface Navigation {
 }
 
 class MessageHandler {
-  private sizeImage = 200;
-
   public async start(duplexStream: Duplex, data: string) {
     const { command, width, length } = this.parseMessage(data);
     const { x: cursorPositionX, y: cursorPositionY } = await mouse.getPosition();
     const widthScreen = await screen.width();
     const heighScreen = await screen.height();
-    //console.log(command, width, length);
-    //console.log(cursorPositionX, cursorPositionY);
-    //console.log(widthScreen, heighScreen);
 
     switch (command) {
       case ('mouse_up'): {
@@ -53,12 +49,23 @@ class MessageHandler {
         break;
       case ('draw_circle'): drawShape.circle(width);
         break;
-      case ('draw_rectangle'): drawShape.rectangle(width, length );
+      case ('draw_rectangle'): drawShape.rectangle(width, length);
         break;
       case ('draw_square'): drawShape.rectangle(width);
         break;
-      case ('prnt_scrn'):
+      case ('prnt_scrn'): {
+        const jimp = await printScreenHandler.start();
+        const stringBase64 = jimp.substring(22);
+        duplexStream.write(`prnt_scrn ${stringBase64}`);
+      }
         break;
+    }
+
+    if (!['mouse_position', 'prnt_scrn'].includes(command)) {
+      duplexStream.write(command, 'utf8');
+    }
+    if (command) {
+      console.log(`The command ${command} is executed`);
     }
   }
 
