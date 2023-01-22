@@ -51,11 +51,11 @@ class MessageHandler {
         break;
       case ('mouse_position'): duplexStream.write(`mouse_position ${cursorPositionX},${cursorPositionY}`);
         break;
-      case ('draw_circle'): drawShape.rectangle(width, length);
+      case ('draw_circle'): drawShape.circle(width);
         break;
-      case ('draw_rectangle'): drawShape.rectangle(width, length);
+      case ('draw_rectangle'): drawShape.rectangle(width, length );
         break;
-      case ('draw_square'): drawShape.circle(width);
+      case ('draw_square'): drawShape.rectangle(width);
         break;
       case ('prnt_scrn'):
         break;
